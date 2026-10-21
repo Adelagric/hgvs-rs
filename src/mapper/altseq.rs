@@ -1059,16 +1059,28 @@ impl<'a> AltSeqBuilder<'a> {
         )
     }
 
-    /// Whether the variant starts in the CDS and ends in the 3' UTR.  HGVS describes such a
-    /// deletion, which removes the stop codon, as a frameshift: "deletions starting 5' of and
-    /// including the translation termination (stop) codon are described as frameshift".  Port
-    /// of biocommons/hgvs#775.
+    /// Whether the variant starts in the CDS and ends in the 3' UTR, or starts before the stop
+    /// codon and ends with its last base.  HGVS describes such a deletion, which removes the
+    /// stop codon, as a frameshift: "deletions starting 5' of and including the translation
+    /// termination (stop) codon are described as frameshift".  biocommons/hgvs does so for the
+    /// first case only (biocommons/hgvs#775).
     fn through_stop_codon(&self) -> bool {
         let HgvsVariant::CdsVariant { loc_edit, .. } = &self.var_c else {
             return false;
         };
         let loc = loc_edit.loc.inner();
-        loc.start.cds_from == CdsFrom::Start && loc.end.cds_from == CdsFrom::End
+        let cds_len = self.reference_data.cds_stop - self.reference_data.cds_start + 1;
+        loc.start.cds_from == CdsFrom::Start
+            && match loc.end.cds_from {
+                CdsFrom::End => true,
+                CdsFrom::Start => {
+                    self.reference_data.cds_end == CdsEnd::StopCodon
+                        && cds_len % 3 == 0
+                        && loc.start.base <= cds_len - 3
+                        && loc.end.base == cds_len
+                        && loc.end.offset.unwrap_or(0) == 0
+                }
+            }
     }
 
     /// Incorporate a dup into the transcript sequence: its copy goes right after the duplicated

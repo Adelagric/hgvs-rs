@@ -2395,10 +2395,12 @@ mod test {
         Ok(())
     }
 
+    /// The deletion starts before the stop codon and ends with it, so HGVS describes it as a
+    /// frameshift.  biocommons/hgvs gives `p.(Lys9_Ter10delinsGly)`, see `DIFFERENCES.md`.
     #[test]
     fn hgvs_c_to_p_deletion_no_frameshift_removes_stop_plus_previous() -> Result<(), Error> {
         let hgvsc = "NM_999999.1:c.25_30del";
-        let hgvsp_expected = "MOCK:p.Lys9_Ter10delinsGly";
+        let hgvsp_expected = "MOCK:p.Lys9GlyfsTer?";
         test_hgvs_c_to_p_conversion(hgvsc, hgvsp_expected)?;
 
         Ok(())
@@ -2558,7 +2560,7 @@ mod test {
     /// are described as frameshift", whatever their length.  The CDS of both transcripts is
     /// `ATG AAA GCG AAA GCG TTT CGC GCG AAA TAG` (`MKAKAFRAK*`).  The 3' UTR of `NM_999977.1` is
     /// `GCTTAGGGGCCCCC` and the one of `NM_999976.1` is `GGCTTAGGGGCCCCC`.  The expectations are
-    /// those of biocommons/hgvs, without the parentheses.
+    /// those of biocommons/hgvs, without the parentheses, except where marked.
     #[test]
     fn hgvs_c_to_p_deletion_through_stop_codon() -> Result<(), Error> {
         let record = |accession: &str, utr3: &str| sanity_mock::ProviderRecord {
@@ -2591,8 +2593,9 @@ mod test {
             ("NM_999977.1:c.27_*1del", "MOCK:p.Lys9AsnfsTer?"),
             ("NM_999977.1:c.26_*1delinsC", "MOCK:p.Lys9ThrfsTer?"),
             ("NM_999977.1:c.26_*13del", "MOCK:p.Lys9XaafsTer?"),
-            // Ends with the stop codon, which counts by the length.
-            ("NM_999977.1:c.25_30del", "MOCK:p.Lys9Ala"),
+            // Ends with the stop codon.  biocommons/hgvs decides by the length here and gives
+            // `p.(Lys9Ala)`, see `DIFFERENCES.md`.
+            ("NM_999977.1:c.25_30del", "MOCK:p.Lys9AlafsTer2"),
             ("NM_999977.1:c.26_30del", "MOCK:p.Lys9SerfsTer?"),
             // Changes the stop codon first, so it is an extension.
             ("NM_999977.1:c.27_30del", "MOCK:p.Ter10LeuextTer?"),
