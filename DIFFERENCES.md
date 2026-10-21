@@ -22,12 +22,6 @@ Each entry names the situation, what biocommons/hgvs does, and what hgvs-rs does
 
 ## Protein prediction (`c_to_p`)
 
-### Uncertain protein changes
-
-- **Situation:** a protein change that `c_to_p` predicts, e.g. for `NM_000059.3:c.7791A>G`.
-- **biocommons/hgvs:** By default, it marks an inferred protein change as uncertain (`inferred_p_is_uncertain`) and gives `NP_000050.2:p.(Lys2597=)` ([defaults.ini][bc-uncertain], [test][bc-am-test]).
-- **hgvs-rs:** It always gives the certain form, `NP_000050.2:p.Lys2597=`. It has no global configuration such as `inferred_p_is_uncertain` (comment in `AltSeqToHgvsp::create_variant()` in [src/mapper/altseq.rs](src/mapper/altseq.rs)).
-
 ### CDS with an incomplete 3' end
 
 - **Situation:** a CDS whose length is not a multiple of 3, e.g. of a GENCODE transcript with the tag `cds_end_NF`.
@@ -153,7 +147,6 @@ Unless an entry says otherwise, the examples use a transcript whose 5' UTR ends 
 [bc-norm-intron]: https://github.com/biocommons/hgvs/blob/13289ab3b9db3c751918906c543991c74917ff61/src/hgvs/normalizer.py#L99-L101
 [bc-am-norm]: https://github.com/biocommons/hgvs/blob/13289ab3b9db3c751918906c543991c74917ff61/src/hgvs/assemblymapper.py#L251-L262
 [bc-am-c-to-p]: https://github.com/biocommons/hgvs/blob/13289ab3b9db3c751918906c543991c74917ff61/src/hgvs/assemblymapper.py#L169-L206
-[bc-uncertain]: https://github.com/biocommons/hgvs/blob/13289ab3b9db3c751918906c543991c74917ff61/src/hgvs/_data/defaults.ini#L5
 [bc-am-test]: https://github.com/biocommons/hgvs/blob/13289ab3b9db3c751918906c543991c74917ff61/tests/test_hgvs_assemblymapper.py#L39-L43
 [bc-norm-test]: https://github.com/biocommons/hgvs/blob/13289ab3b9db3c751918906c543991c74917ff61/tests/test_hgvs_normalizer.py#L187-L188
 [bc-cds-len]: https://github.com/biocommons/hgvs/blob/13289ab3b9db3c751918906c543991c74917ff61/src/hgvs/utils/reftranscriptdata.py#L28-L39
