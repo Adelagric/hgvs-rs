@@ -1064,7 +1064,7 @@ impl<'a> AltSeqBuilder<'a> {
     /// codon and ends with its last base.  HGVS describes such a deletion, which removes the
     /// stop codon, as a frameshift: "deletions starting 5' of and including the translation
     /// termination (stop) codon are described as frameshift".  biocommons/hgvs does so for the
-    /// first case only (biocommons/hgvs#775).
+    /// first case only (biocommons/hgvs#775), see `DIFFERENCES.md`.
     fn through_stop_codon(&self) -> bool {
         let HgvsVariant::CdsVariant { loc_edit, .. } = &self.var_c else {
             return false;
